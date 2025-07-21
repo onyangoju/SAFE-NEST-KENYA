@@ -140,62 +140,104 @@ export default function CaseDetailPage() {
   }
   if (!caseReport) return null
 
+  // Ensure user is always non-null for role checks
+  const userRole = user?.role || '';
+
   return (
-    <div className="max-w-2xl mx-auto mt-12 p-4 sm:p-8 bg-white rounded-xl shadow-lg border border-gray-100">
-      <div className="flex flex-col items-center mb-6">
-        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-green-500 rounded-lg flex items-center justify-center mb-2">
-          <FileText className="w-6 h-6 text-white" />
+    <div className="max-w-2xl mx-auto mt-12 p-4 sm:p-8 bg-gradient-to-br from-blue-100 via-white to-green-100 rounded-xl shadow-lg border border-gray-200">
+      {/* Header */}
+      <div className="flex flex-col items-center mb-8">
+        <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center mb-2 shadow-lg">
+          <FileText className="w-7 h-7 text-white" />
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Case Details</h1>
-        <p className="text-gray-600 text-sm text-center">All information is private and secure.</p>
+        <h1 className="text-3xl font-extrabold text-blue-700 mb-1">Case Details</h1>
+        <p className="text-green-700 text-base text-center">All information is private and secure.</p>
       </div>
-      <div className="mb-6">
-        <div className="mb-2 flex items-center gap-2"><span className="font-semibold">Title:</span> {caseReport.title}</div>
-        <div className="mb-2 flex items-center gap-2"><span className="font-semibold">Status:</span>
-          {['counselor', 'admin'].includes(user.role) ? (
+
+      {/* Case Info */}
+      <div className="mb-8 grid grid-cols-1 gap-4">
+        <div className="flex items-center gap-3 p-4 bg-blue-200/80 rounded-lg border border-blue-300">
+          <span className="font-semibold text-blue-900 w-32">Title:</span>
+          <span className="text-blue-900 font-bold">{caseReport.title}</span>
+        </div>
+        <div className="flex items-center gap-3 p-4 bg-green-200/80 rounded-lg border border-green-300">
+          <span className="font-semibold text-green-900 w-32">Status:</span>
+          {['counselor', 'admin'].includes(userRole) ? (
             <select value={caseReport.status} onChange={handleStatusChange} className="form-input w-auto">
               {STATUS_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
             </select>
           ) : (
-            <span className="capitalize px-2 py-1 rounded text-xs font-semibold bg-gray-100 text-gray-700">{caseReport.status.replace('_', ' ')}</span>
+            <span className={`capitalize px-2 py-1 rounded text-xs font-bold shadow-sm ${
+              caseReport.status === 'resolved'
+                ? 'bg-green-500 text-white'
+                : caseReport.status === 'in_progress'
+                ? 'bg-yellow-400 text-yellow-900'
+                : 'bg-gray-300 text-gray-800'
+            }`}>
+              {caseReport.status.replace('_', ' ')}
+            </span>
           )}
-          {statusUpdating && <Loader2 className="w-4 h-4 animate-spin inline-block ml-2" />}
-          {statusSuccess && <CheckCircle className="w-4 h-4 text-green-500 inline-block ml-2" />}
-          {statusError && <span className="text-red-500 ml-2">{statusError}</span>}
         </div>
-        <div className="mb-2 flex items-center gap-2"><span className="font-semibold">Date:</span> {format(new Date(caseReport.incident_date), 'yyyy-MM-dd')}</div>
-        <div className="mb-2 flex items-center gap-2"><span className="font-semibold">Location:</span> {caseReport.location}</div>
-        <div className="mb-2 flex items-center gap-2"><span className="font-semibold">Anonymous:</span> {caseReport.is_anonymous ? 'Yes' : 'No'}</div>
-        <div className="mb-2 flex items-center gap-2"><span className="font-semibold">Sentiment Score:</span> {caseReport.sentiment_score !== null ? caseReport.sentiment_score.toFixed(2) : 'N/A'}</div>
-        <div className="mb-2"><span className="font-semibold">Description:</span>
-          <div className="bg-gray-50 rounded p-2 mt-1 text-gray-700 whitespace-pre-line">{caseReport.description}</div>
+        <div className="flex items-center gap-3 p-4 bg-yellow-100/80 rounded-lg border border-yellow-300">
+          <span className="font-semibold text-yellow-900 w-32">Date:</span>
+          <span className="text-yellow-900">{format(new Date(caseReport.incident_date), 'yyyy-MM-dd')}</span>
+        </div>
+        <div className="flex items-center gap-3 p-4 bg-pink-100/80 rounded-lg border border-pink-300">
+          <span className="font-semibold text-pink-900 w-32">Location:</span>
+          <span className="text-pink-900">{caseReport.location}</span>
+        </div>
+        <div className="flex items-center gap-3 p-4 bg-purple-100/80 rounded-lg border border-purple-300">
+          <span className="font-semibold text-purple-900 w-32">Anonymous:</span>
+          <span className={`px-2 py-1 rounded text-xs font-bold shadow-sm ${
+            caseReport.is_anonymous ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-800'
+          }`}>
+            {caseReport.is_anonymous ? 'Yes' : 'No'}
+          </span>
+        </div>
+        <div className="flex items-center gap-3 p-4 bg-indigo-100/80 rounded-lg border border-indigo-300">
+          <span className="font-semibold text-indigo-900 w-32">Sentiment Score:</span>
+          <span className="text-indigo-900">{caseReport.sentiment_score !== null ? caseReport.sentiment_score.toFixed(2) : 'N/A'}</span>
         </div>
       </div>
-      <div className="mb-6">
-        <div className="font-semibold mb-2 flex items-center gap-2"><UploadCloud className="w-4 h-4 text-blue-500" /> Evidence Files</div>
+
+      {/* Description */}
+      <div className="mb-8">
+        <div className="font-semibold mb-2 text-blue-700 text-lg">Description:</div>
+        <div className="bg-blue-50 rounded p-3 text-gray-800 whitespace-pre-line border border-blue-200 shadow-inner">{caseReport.description}</div>
+      </div>
+
+      {/* Evidence Files */}
+      <div className="mb-8">
+        <div className="font-semibold mb-2 flex items-center gap-2 text-green-700 text-lg">
+          <UploadCloud className="w-5 h-5 text-green-500" /> Evidence Files
+        </div>
         {evidence.length === 0 ? (
           <div className="text-gray-500 text-sm">No evidence files attached.</div>
         ) : (
           <ul className="space-y-2">
             {evidence.map(file => (
-              <li key={file.id} className="flex items-center gap-2 text-sm bg-gray-50 rounded px-2 py-1">
-                <a href={file.file_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline flex-1 truncate">{file.file_name}</a>
+              <li key={file.id} className="flex items-center gap-2 text-sm bg-green-50 rounded px-2 py-1 border border-green-200">
+                <a href={file.file_url} target="_blank" rel="noopener noreferrer" className="text-green-700 hover:underline flex-1 truncate">{file.file_name}</a>
                 <span className="text-gray-400">({(file.file_size / 1024).toFixed(1)} KB)</span>
               </li>
             ))}
           </ul>
         )}
       </div>
+
+      {/* Comments */}
       <div className="mb-6">
-        <div className="font-semibold mb-2 flex items-center gap-2"><MessageCircle className="w-4 h-4 text-blue-500" /> Comments</div>
+        <div className="font-semibold mb-2 flex items-center gap-2 text-purple-700 text-lg">
+          <MessageCircle className="w-5 h-5 text-purple-500" /> Comments
+        </div>
         {comments.length === 0 ? (
           <div className="text-gray-500 text-sm">No comments yet.</div>
         ) : (
           <ul className="space-y-2 mb-4">
             {comments.map(comment => (
-              <li key={comment.id} className="bg-gray-50 rounded p-2 text-sm">
+              <li key={comment.id} className="bg-purple-50 rounded p-2 text-sm border border-purple-200">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-semibold text-blue-600">{comment.user_role}</span>
+                  <span className="font-semibold text-purple-700">{comment.user_role}</span>
                   <span className="text-gray-400 text-xs">{format(new Date(comment.created_at), 'yyyy-MM-dd HH:mm')}</span>
                 </div>
                 <div className="text-gray-700 whitespace-pre-line">{comment.content}</div>
@@ -203,7 +245,7 @@ export default function CaseDetailPage() {
             ))}
           </ul>
         )}
-        <form onSubmit={handleAddComment} className="flex gap-2 items-end">
+        <form onSubmit={handleAddComment} className="flex gap-2 items-end mt-2">
           <textarea
             className="form-input flex-1"
             rows={2}
@@ -213,7 +255,7 @@ export default function CaseDetailPage() {
             required
             disabled={commentLoading}
           />
-          <button type="submit" className="btn-primary bg-blue-500 hover:bg-blue-600 text-white focus:ring-blue-500" disabled={commentLoading || !commentText.trim()}>
+          <button type="submit" className="btn-primary bg-purple-500 hover:bg-purple-600 text-white focus:ring-purple-500" disabled={commentLoading || !commentText.trim()}>
             {commentLoading ? 'Posting...' : 'Post'}
           </button>
         </form>

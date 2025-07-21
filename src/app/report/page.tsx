@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import { Shield, Eye, Lock, FileText, CheckCircle, AlertCircle, UploadCloud, X } from 'lucide-react'
+import { useAuth } from '../../lib/auth-context';
 
 async function analyzeSentiment(text: string): Promise<number | null> {
   try {
@@ -27,6 +28,7 @@ async function analyzeSentiment(text: string): Promise<number | null> {
 }
 
 export default function ReportPage() {
+  const { user } = useAuth();
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -39,6 +41,7 @@ export default function ReportPage() {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [lastSubmission, setLastSubmission] = useState<any>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -66,22 +69,26 @@ export default function ReportPage() {
     // Sentiment analysis (disabled)
     // const sentiment_score = await analyzeSentiment(form.description)
     const sentiment_score = null;
+    // Prepare submission data
+    const submissionData = {
+      title: form.title,
+      description: form.description,
+      incident_date: form.incident_date,
+      location: form.location,
+      is_anonymous: form.is_anonymous,
+      status: 'pending',
+      severity_level: 'medium',
+      sentiment_score,
+      victim_id: user?.id,
+    };
+    setLastSubmission(submissionData);
     // Insert report into Supabase
     const { data: report, error: reportError } = await supabase.from('case_reports').insert([
-      {
-        title: form.title,
-        description: form.description,
-        incident_date: form.incident_date,
-        location: form.location,
-        is_anonymous: form.is_anonymous,
-        status: 'pending',
-        severity_level: 'medium',
-        sentiment_score,
-      },
+      submissionData
     ]).select('id').single()
     if (reportError || !report) {
       setSubmitting(false)
-      setError('There was a problem submitting your report. Please try again.')
+      setError('There was a problem submitting your report. ' + (reportError?.message || JSON.stringify(reportError) || 'Unknown error'))
       return
     }
     // Upload files and store metadata
@@ -114,6 +121,10 @@ export default function ReportPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-green-50 py-12">
       <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-8 border border-gray-100">
+        {/* TEMP: Show user ID for debugging */}
+        <div className="mb-4 text-xs text-gray-500">
+          <strong>Current user ID:</strong> {user?.id || 'No user'}
+        </div>
         <div className="flex flex-col items-center mb-6">
           <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-green-500 rounded-lg flex items-center justify-center mb-2">
             <FileText className="w-6 h-6 text-white" />

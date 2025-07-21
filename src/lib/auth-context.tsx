@@ -1,10 +1,11 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { supabase } from './/supabase';
+import { supabase } from './supabase';
 
 interface UserProfile {
   id: string;
+  user_id: string;
   email: string;
   full_name: string;
   role: "victim" | "counselor" | "admin";
@@ -47,8 +48,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log('3. User found in session:', session.user.id);
         const { data, error } = await supabase
           .from("profiles")
-          .select("id, email, full_name, role")
-          .eq("id", session.user.id)
+          .select("id, user_id, email, full_name, role")
+          .eq("user_id", session.user.id)
           .single();
         
         console.log('4. Profile fetch result:', { data, error });
@@ -57,8 +58,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           console.log('5. Profile found, setting user.');
           setUser(data);
         } else {
-          console.warn('6. No profile found. It might need to be created.');
-          setUser(null);
+          // No profile found, create one
+          console.warn('6. No profile found. Creating new profile.');
+          const now = new Date().toISOString();
+          const { data: newProfile, error: insertError } = await supabase
+            .from("profiles")
+            .insert([
+              {
+                user_id: session.user.id,
+                email: session.user.email,
+                full_name: session.user.user_metadata?.full_name || '',
+                role: 'victim', // default role
+                created_at: now,
+                updated_at: now,
+              },
+            ])
+            .select("id, user_id, email, full_name, role")
+            .single();
+          if (newProfile) {
+            setUser(newProfile);
+          } else {
+            setUser(null);
+            console.error('Profile creation error:', insertError);
+          }
         }
       } else {
         console.log('7. No session found.');
@@ -96,4 +118,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   return useContext(AuthContext);
+}
+
+// Add a reusable LogoutButton component
+export function LogoutButton() {
+  const { signOut } = useAuth();
+  return (
+    <button onClick={signOut} className="px-4 py-2 bg-red-500 text-white rounded">
+      Log out
+    </button>
+  );
 } 

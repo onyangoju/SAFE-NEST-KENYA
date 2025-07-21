@@ -7,6 +7,7 @@ import { Shield, FileText, Loader2, AlertCircle, Eye, Lock, Bell } from 'lucide-
 import { supabase } from '../../lib/supabase'
 import { useNotifications } from '../../lib/notification-context'
 import { format } from 'date-fns'
+import { LogoutButton } from '../../lib/auth-context'
 
 interface CaseReport {
   id: string
@@ -58,6 +59,9 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-3xl mx-auto mt-12 p-4 sm:p-8 bg-white rounded-xl shadow-lg border border-gray-100">
+      <div className="flex justify-end mb-2">
+        <LogoutButton />
+      </div>
       <div className="flex flex-col items-center mb-6 relative">
         {/* Notification Bell */}
         <button
@@ -111,27 +115,45 @@ export default function DashboardPage() {
       ) : cases.length === 0 ? (
         <div className="text-center text-gray-500 py-8">No case reports found.</div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm border rounded-lg">
+        <div className="overflow-x-auto mt-6">
+          <table className="min-w-full text-sm border rounded-lg shadow">
+            <caption className="caption-top text-lg font-semibold text-gray-800 mb-2">
+              Your Case Reports
+            </caption>
             <thead>
-              <tr className="bg-blue-50">
-                <th className="px-4 py-2 text-left">Title</th>
-                <th className="px-4 py-2 text-left">Status</th>
-                <th className="px-4 py-2 text-left">Date</th>
-                <th className="px-4 py-2 text-left">Sentiment</th>
-                <th className="px-4 py-2 text-left">Anonymous</th>
+              <tr className="bg-blue-100 text-blue-900">
+                <th className="px-4 py-3 text-left border-b">Title</th>
+                <th className="px-4 py-3 text-left border-b">Status</th>
+                <th className="px-4 py-3 text-left border-b">Date</th>
+                <th className="px-4 py-3 text-left border-b">Sentiment</th>
+                <th className="px-4 py-3 text-left border-b">Anonymous</th>
               </tr>
             </thead>
             <tbody>
-              {cases.map((c) => (
-                <tr key={c.id} className="border-b hover:bg-blue-50/50 cursor-pointer" onClick={() => router.push(`/dashboard/${c.id}`)}>
-                  <td className="px-4 py-2 font-medium text-gray-900 flex items-center gap-2"><FileText className="w-4 h-4 text-blue-400" />{c.title}</td>
-                  <td className="px-4 py-2 capitalize">
-                    <span className={`px-2 py-1 rounded text-xs font-semibold ${c.status === 'resolved' ? 'bg-green-100 text-green-700' : c.status === 'in_progress' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-700'}`}>{c.status.replace('_', ' ')}</span>
+              {cases.map((c, idx) => (
+                <tr
+                  key={c.id}
+                  className={`border-b hover:bg-blue-50/70 cursor-pointer ${idx % 2 === 0 ? 'bg-white' : 'bg-blue-50/30'}`}
+                  onClick={() => router.push(`/dashboard/${c.id}`)}
+                >
+                  <td className="px-4 py-3 font-medium text-gray-900 flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-blue-400" />
+                    {c.title}
                   </td>
-                  <td className="px-4 py-2">{format(new Date(c.incident_date), 'yyyy-MM-dd')}</td>
-                  <td className="px-4 py-2">{c.sentiment_score !== null ? c.sentiment_score.toFixed(2) : 'N/A'}</td>
-                  <td className="px-4 py-2">{c.is_anonymous ? 'Yes' : 'No'}</td>
+                  <td className="px-4 py-3 capitalize">
+                    <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                      c.status === 'resolved'
+                        ? 'bg-green-100 text-green-700'
+                        : c.status === 'in_progress'
+                        ? 'bg-yellow-100 text-yellow-700'
+                        : 'bg-gray-100 text-gray-700'
+                    }`}>
+                      {c.status.replace('_', ' ')}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">{format(new Date(c.incident_date), 'yyyy-MM-dd')}</td>
+                  <td className="px-4 py-3">{c.sentiment_score !== null ? c.sentiment_score.toFixed(2) : 'N/A'}</td>
+                  <td className="px-4 py-3">{c.is_anonymous ? 'Yes' : 'No'}</td>
                 </tr>
               ))}
             </tbody>
