@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '../../lib/supabase'
 import { Shield, Eye, Lock, FileText, CheckCircle, AlertCircle, UploadCloud, X } from 'lucide-react'
 
 async function analyzeSentiment(text: string): Promise<number | null> {

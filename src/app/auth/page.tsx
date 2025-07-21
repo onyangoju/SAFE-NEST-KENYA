@@ -2,9 +2,9 @@
 
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '../../lib/supabase'
 import { Shield, Loader2 } from 'lucide-react'
-import { useAuth } from '@/lib/auth-context'
+import { useAuth } from '../../lib/auth-context'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 

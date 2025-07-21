@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from './/supabase';
 import { useAuth } from "./auth-context";
 
 export interface Notification {

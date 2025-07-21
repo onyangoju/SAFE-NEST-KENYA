@@ -1,11 +1,11 @@
 'use client'
 
-import { useAuth } from '@/lib/auth-context'
+import { useAuth } from '../../lib/auth-context'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Shield, FileText, Loader2, AlertCircle, Eye, Lock, Bell } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
-import { useNotifications } from '@/lib/notification-context'
+import { supabase } from '../../lib/supabase'
+import { useNotifications } from '../../lib/notification-context'
 import { format } from 'date-fns'
 
 interface CaseReport {

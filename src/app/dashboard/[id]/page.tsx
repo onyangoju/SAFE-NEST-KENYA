@@ -1,9 +1,9 @@
 'use client'
 
-import { useAuth } from '@/lib/auth-context'
+import { useAuth } from '../../../lib/auth-context'
 import { useRouter, useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '../../../lib/supabase'
 import { Shield, FileText, Loader2, AlertCircle, Eye, Lock, CheckCircle, UploadCloud, MessageCircle } from 'lucide-react'
 import { format } from 'date-fns'
 

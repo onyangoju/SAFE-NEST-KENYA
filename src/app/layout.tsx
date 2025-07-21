@@ -2,8 +2,8 @@ import './globals.css'
 import Link from 'next/link'
 import { Inter } from 'next/font/google'
 import type { Metadata } from 'next'
-import { AuthProvider } from '@/lib/auth-context'
-import { NotificationProvider } from '@/lib/notification-context'
+import { AuthProvider } from '../lib/auth-context'
+import { NotificationProvider } from '../lib/notification-context'
 
 const inter = Inter({ subsets: ['latin'] })
 
