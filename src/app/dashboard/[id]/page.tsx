@@ -1,9 +1,9 @@
 'use client'
 
-import { useAuth } from '../../../lib/auth-context'
+import { useAuth } from '@/lib/auth-context'
 import { useRouter, useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { supabase } from '../../../lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { Shield, FileText, Loader2, AlertCircle, Eye, Lock, CheckCircle, UploadCloud, MessageCircle } from 'lucide-react'
 import { format } from 'date-fns'
 
@@ -72,6 +72,13 @@ export default function CaseDetailPage() {
     const { data: users } = await supabase.from('profiles').select('id, role')
     const counselorAdminIds = (users || []).filter(u => u.role === 'counselor' || u.role === 'admin').map(u => u.id)
     const notifications = []
+    
+    // Add a null check for caseData
+    if (!caseData) {
+      console.error('Could not find case data to send notifications.')
+      return
+    }
+
     if (caseData?.victim_id) notifications.push({ user_id: caseData.victim_id, type, message, case_id: caseId, is_read: false })
     if (type === 'comment') {
       for (const id of counselorAdminIds) {
