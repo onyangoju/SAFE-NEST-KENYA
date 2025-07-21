@@ -1,0 +1,35 @@
+# Main dependencies for Safe Nest Kenya (Next.js + Supabase + React)
+
+# Next.js and React
+next
+react
+react-dom
+
+# Supabase
+@supabase/supabase-js
+@supabase/auth-ui-react
+@supabase/auth-ui-shared
+
+# Leaflet for maps
+leaflet
+react-leaflet
+
+# Lucide icons
+lucide-react
+
+# TypeScript and types (if using TypeScript)
+typescript
+@types/react
+@types/node
+@types/leaflet
+
+# Tailwind CSS and PostCSS
+postcss
+postcss-preset-env
+tailwindcss
+
+# Date formatting
+date-fns
+
+# (Optional) dotenv for local env support
+dotenv
