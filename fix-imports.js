@@ -34,6 +34,7 @@ function walk(dir) {
       replaceAliasInFile(fullPath);
     }
   });
+
 }
 
 // Start from src/

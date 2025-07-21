@@ -1,25 +1,37 @@
+'use client' // Convert to client component for useState
 import './globals.css'
 import Link from 'next/link'
 import { Inter } from 'next/font/google'
 import type { Metadata } from 'next'
 import { AuthProvider } from '../lib/auth-context'
 import { NotificationProvider } from '../lib/notification-context'
+import { useState } from 'react' // Import useState
+import { Menu, X } from 'lucide-react' // Import icons for menu button
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata: Metadata = {
-  title: "Safe Nest Kenya",
-  description: "Safe Nest Kenya",
-};
+// Metadata is now defined outside the component
+// export const metadata: Metadata = {
+//   title: "Safe Nest Kenya",
+//   description: "Safe Nest Kenya",
+// };
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleQuickExit = () => {
+    window.location.href = 'https://www.google.com';
+  };
+
   return (
     <html lang="en">
       <head>
+        <title>Safe Nest Kenya</title>
+        <meta name="description" content="Safe Nest Kenya" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -39,7 +51,7 @@ export default function RootLayout({
                   <img src="/snk.jpg" alt="Safe Nest Kenya Logo" className="h-12 w-12 object-contain" />
                   <span className="text-2xl font-bold text-white">Safe Nest Kenya</span>
                 </div>
-                {/* Menu center */}
+                {/* Menu center (desktop) */}
                 <div className="hidden md:flex gap-10">
                   <Link href="/" className="hover:text-blue-900 text-white font-medium">Home</Link>
                   <Link href="/support" className="hover:text-blue-900 text-white font-medium">Support</Link>
@@ -48,8 +60,31 @@ export default function RootLayout({
                   <Link href="#contact" className="hover:text-blue-900 text-white font-medium">Contact</Link>
                 </div>
                 {/* Quick Exit right */}
-                <button className="border border-white text-sky-900 bg-white/80 rounded px-6 py-3 font-semibold hover:bg-white transition">Quick Exit</button>
+                <div className="hidden md:block">
+                  <button onClick={handleQuickExit} className="border border-white text-sky-900 bg-white/80 rounded px-6 py-3 font-semibold hover:bg-white transition">Quick Exit</button>
+                </div>
+                {/* Mobile Menu Button */}
+                <div className="md:hidden">
+                  <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                    {isMenuOpen ? <X className="h-8 w-8 text-white" /> : <Menu className="h-8 w-8 text-white" />}
+                  </button>
+                </div>
               </nav>
+
+              {/* Mobile Menu Panel */}
+              {isMenuOpen && (
+                <div className="md:hidden absolute top-20 left-0 w-full bg-sky-500/95 z-40 shadow-lg">
+                  <div className="flex flex-col items-center gap-6 py-8">
+                    <Link href="/" className="hover:text-blue-900 text-white font-medium text-lg" onClick={() => setIsMenuOpen(false)}>Home</Link>
+                    <Link href="/support" className="hover:text-blue-900 text-white font-medium text-lg" onClick={() => setIsMenuOpen(false)}>Support</Link>
+                    <Link href="/resources" className="hover:text-blue-900 text-white font-medium text-lg" onClick={() => setIsMenuOpen(false)}>Resources</Link>
+                    <Link href="/chat" className="hover:text-blue-900 text-white font-medium text-lg" onClick={() => setIsMenuOpen(false)}>Chat</Link>
+                    <Link href="#contact" className="hover:text-blue-900 text-white font-medium text-lg" onClick={() => setIsMenuOpen(false)}>Contact</Link>
+                    <button onClick={() => { handleQuickExit(); setIsMenuOpen(false); }} className="mt-4 border border-white text-white bg-red-500/80 rounded px-8 py-3 font-semibold hover:bg-red-600 transition">Quick Exit</button>
+                  </div>
+                </div>
+              )}
+
               {/* Main Content */}
               <div className="flex-1">
                 {children}
